@@ -1,19 +1,28 @@
+'''
+This script was built with the intention of creating
+a new dataset by combining information derived more variables for a "GOODSTUFF" database.  The variables
+would be generated from a list of unique ASIN from said
+database.  The variables would be obtained via Amazon
+MWS api.  The extended variables include brand, salesrank,
+product_group, etc.(see below for complete list
+'''
+
 from boto.mws.connection import MWSConnection
-import numpy as np
 import pandas as pd
 from itertools import zip_longest
 import time
 from attributes import Attributes
 from boto.exception import BotoServerError
 from multiprocessing import Pool
-import multiprocessing as mp
+import os
 
 
 # AWS Credentials
-aws_access_key_id = 'AKIAJ5D2V2OWY2DZTI3Q'
-aws_secret_access_key = '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'
-sellerid = 'A11P5SV6O6WK0G'
-marketplaceid = 'ATVPDKIKX0DER'
+aws_access_key_id = os.environ.get('aws_access_key_id')
+aws_secret_access_key = os.environ.get('aws_secret_access_key')
+sellerid = os.environ.get('sellerid')
+marketplaceid = os.environ.get('marketplaceid')
+
 mws = MWSConnection(aws_access_key_id=aws_access_key_id,
                     aws_secret_access_key=aws_secret_access_key,
                     Merchant=sellerid)
