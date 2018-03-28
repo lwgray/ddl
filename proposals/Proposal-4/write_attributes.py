@@ -61,12 +61,12 @@ def get_attributes(asin_list):
                                                 ASINList=asins)
         except AttributeError:
             print('AttributeError')
-            time.sleep(10)
+            time.sleep(20)
             response = mws.get_matching_product(MarketplaceId=marketplaceid,
                                                 ASINList=asins)
         except BotoServerError:
             print('BotoServerError')
-            time.sleep(10)
+            time.sleep(20)
             response = mws.get_matching_product(MarketplaceId=marketplaceid,
                                                 ASINList=asins)
         except:
@@ -99,10 +99,10 @@ if __name__ == '__main__':
     asin_10 = asin_list[:10]
 
     # Perform tasks with multiprocessing
-    pool = Pool(processes=8)
-    with open('test.csv', 'a') as f:
+    pool = Pool(processes=6)
+    with open('test2.csv', 'a') as f:
         writer = csv.writer(f)
-        for results in pool.imap(get_attributes, [asin_list]):
+        for results in pool.imap(get_attributes, [asin_list[:1000]]):
             for result in results:
                 writer.writerow(result)
     pool.close()
