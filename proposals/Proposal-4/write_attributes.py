@@ -15,6 +15,7 @@ from attributes import Attributes
 from boto.exception import BotoServerError
 from multiprocessing import Pool
 import os
+import csv
 
 
 # AWS Credentials
@@ -95,11 +96,18 @@ if __name__ == '__main__':
     # Create list of list containing 10 ASINS per list
     asin_list = list(zip_longest(*[iter(data.asin.unique())]*10))
     # asin_100 = asin_list[:100]
-    # asin_10 = asin_list[:10]
+    asin_10 = asin_list[:10]
 
     # Perform tasks with multiprocessing
     pool = Pool(processes=8)
-    # result = []
+    with open('test.csv', 'a') as f:
+        writer = csv.writer(f)
+        for results in pool.imap(get_attributes, [asin_list]):
+            for result in results:
+                writer.writerow(result)
+    pool.close()
+    pool.join()
+    '''
     result = pool.map(get_attributes, [asin_list])
     pool.close()
     pool.join()
@@ -111,3 +119,4 @@ if __name__ == '__main__':
                                             'min_age', 'product_group'])
     # Convert to csv
     attr.to_csv('attributes.csv', header=False)
+    '''
