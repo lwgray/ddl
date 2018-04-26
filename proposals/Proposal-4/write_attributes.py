@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     # Perform tasks with multiprocessing
     pool = Pool(processes=6)
-    with open('test2.csv', 'a') as f:
+    with open('test3.csv', 'a') as f:
         writer = csv.writer(f)
         for results in pool.imap(get_attributes, [asin_list[:1000]]):
             for result in results:
