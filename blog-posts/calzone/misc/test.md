@@ -54,6 +54,23 @@ def lemmatize(data):
 
 ### Feature and Target Extraction
 
+Machine learning tasks require two components, a target(s) and a feature(s).  It is the relationship between the features and targets that allow us to predict if a title will be popular or unpopular.  A feature is an individual measurable property or characteristic of a phenomenon being observed. In our case, the title phrase is the measurable feature.  However, we can also generate multiple new features from the title phrase.  This includes a count of the number of words, characters, vowels, consonants, syllables, different parts of speech, and noun phrases in each title.  This further includes a measure of the subjectivity, polarity, reading grade level, and readability of each title.   A target is the class that is being predicted(i.e. popular or unpopular).  In our case, the target is a proxy for votes.  If a title received less than the average number of votes then the title was labeled as unpopular and the opposite if greater than average number of votes. Features are typically expressed numerically thus we would need to employ ["term frequency-inverse document frequency"](https://nbviewer.jupyter.org/github/lwgray/ddl/blob/master/blog-posts/calzone/tfidf.ipynb)(tf-idf) to convert the entire title phrase into numbers. 
+
+
+### Initial Text Processing
+
+
+
+### Intial Data Exploration
+
+If we look at all the words contained in our corpus we can develop an overview of the usage of each word, excluding the most common words(a, the, of, etc).  We use Yellowbrick to generate a frequency distribution chart that showcases the most common terms.  As expected, since we are in /r/datascience, the term data scientist is at the top of the word list.  Most interesting are the themes that become apparent.  In the list below you can see that the words can be categorized into four areas.  Each area is comprised of some of the words in parentheses.  It appears that the titles are dominated by the subject of the education required to find employment for a certain position.
+
+1.  Positions (data scientist, analyst)
+2.  Tools & Topics (big data, python, machine learning, etc)
+3.  Employment (Career, experience, job, work)
+4.  Education ( learning, course, masters)
+
+If we look at the distribution of the votes from all the titles.  We see that the distribution is left-skewed with a large portion of the titles receiving less than 10 votes.
 
 
 # Steps 1 - 4 (tldr)
