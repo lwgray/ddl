@@ -69,12 +69,42 @@ If we look at all the words contained in our corpus we can develop an overview o
 3.  Employment (Career, experience, job, work)
 4.  Education ( learning, course, masters)
 
+<img src="figures/predicting-reddit-upvotes-3.png">
+
 If we look at the distribution of the votes from all the titles.  We see that the distribution is left-skewed with a large portion of the titles receiving less than 10 votes.
 
+<img src="figures/predicting-reddit-upvotes-1.png">
 
 ### Text Features
 
-The titles provide us with two different types of information.  The first type is the general attributes of the title; i.e. how many words, syllables, vowels, etc... (see above for list of attributes) in each title.  The second type is the words themselves.  The question is how do we use both types of information to predict if a title will be successful.  For the attributes, it is simple because they are numbers; it could be as easy as finding out which combination of attributes define success versus failure.  How to define success with just words becomes tricky.  Essentially, performing machine learning on the titles requires that the text content be turned into numerical feature vectors(feature extraction).  
+The titles provide us with two different types of information.  The first type is the general attributes of the title; i.e. how many words, syllables, vowels, etc... in each title.  Below is a list of the attributes along a table that shows the average values for these attributes in popular and unpopular posts.  So how do we know which of these attributes to use for our study?  Colinearity can be useful in determining which attributes to include in analysis.  The idea is to remove attributes that highly correlate with each other.  The correlation plot below makes sense, there should be a correlation between vowels and syllables, as the number of vowels in a word typically determine the number of syllables. 
+
+    LIST OF ATTRIBUTES
+    ------------------
+    1.  The numbers characters in the titles
+    2.  The number of words in the titles
+    3.  The number of noun phrases in the titles
+    4.  The subjectivity of the titles - ranging from 0(objective) to 1(subjective)
+    5.  The polarity of the titles: -1(negative) to 0(neutral) to 1(positive)
+    6.  The number of votes per title
+    7.  The number of consonants in titles
+    8.  The number of vowels in titles
+    9.  The number of syllables in titles
+    10. The kincaid score of each title (measures the reading grade level required to read the title)
+    11. The flesch score of each titles (measures how easy it is to read the title)
+    12. The parts-of-speech(pos) present in each title ( There are 35 pos thus this info isn't included in the table below)
+
+
+|       |Characters|Words|Noun_Phrases|Syllables|Subjectivity|Polarity|Votes |Consonants|Vowels|Kincaid|Flesch|
+|------:|---------:|----:|-----------:|--------:|-----------:|-------:|-----:|---------:|-----:|------:|-----:|
+|All    |        58|   10|       1.474|       16|      0.1965| 0.07431| 7.719|        39|    18|      8|    47|
+|Popular|        60|   11|       1.530|       17|      0.2130| 0.08690|20.522|        41|    19|      8|    48|
+|Unpopular|        57|   10|       1.451|       16|      0.1897| 0.06916| 2.481|        38|    18|      8|    46|
+
+
+<img src="figures/predicting-reddit-upvotes-2.png">
+
+The second type of information housed by the titles are the words themselves.  The question is how do we use both types of information to predict if a title will be successful.  For the attributes, it is simple because they are numbers; it could be as easy as finding out which combination of attributes define success versus failure.  How to define success with just words becomes tricky.  Essentially, performing machine learning on the titles requires that the text content be turned into numerical feature vectors(feature extraction).  
 
 For feature extraction on the titles, we used a count vectorizer that measures term frequency(tf); i.e. how often a word appears in a title.  For instance, if we do this for the following sentences, then we produce the matrix below.  
 
@@ -100,19 +130,12 @@ The tf-idf process leaves us with about a vocabulary of 58,000 (see side note, f
 Let's not forget about the title attributes, they also need to undergo feature selection.  We did this by using tree-based estimators(ExtraTreesClassifier) to compute feature importance, which can be used to discard irrelevant features.  This resulted in a reduction from 45 to 17 most important attributes.
 
 ## Modeling
-- Describe modeling process 
-- Describe binary classification 
+Using Scikit-Learn's "feature union" function, we combined the attribute and tf-idf vectors then inserted this vector into a Random Forest Classifier. We chose Random Forest only after trying out several other classifers, such as Naive Bayes, Multilayer Perceptron, and K Nearest Neighbors. We optimized our model by tuning the hyperparameters. We evaluated our model with common scoring methods; Our accuracy was 55%. The charts below provide more visual evaluations. A great model would have higher precision, recall, and F1 Score plus a ROC curve that hugs the y-axis. I do not have a great model and I'm ok with that! The code for the visual evaluation charts is here. 
 
 ### Model Pipeline
+Here is a more detailed outline of the model pipeline coded below.  Sklearn has a pipeline Class that directs the flow of model creation; within the first pipeline is a sklearn Class called FeatureUnion.  Feature Union allows for the joining of multiple features into a single vector.  Within the feature union is a transformer list, containing classes that performed the functions described above (tf-idf, feature-selection, etc).  The final pipeline item is the declaration of a classifier, that the combined feature vector will be inserted into.  Once the model is built, it is next fitted with the training data.  The model is tested for precision, f1-score and recall.  Afterwards, we save the model and now can use it to make predictions.
+
 ```python
-# 1. Sklearn has a pipeline Class that directs the flow of model creation; 
-# below the pipeline corals the features into the Random Forest classifer.
-# 2. Within the pipeline is a sklearn Class called FeatureUnion.  
-# 3. Feature Union allows for the joining of multiple features into a single vector
-# 4. Within the feature union is a transformer list,
-# containingclasses that performed the functions described above
-# 5. The final pipeline item is the declaration of a classifier,
-# that the combined feature vector will be inserted into
 
 pipeline = Pipeline([
     ('union', FeatureUnion(
